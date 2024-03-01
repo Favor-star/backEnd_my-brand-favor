@@ -8,5 +8,6 @@ export const stories = [
       "Lorem ipsum the story geos up here. This story must be long long long",
     storyImageURL: "The image url goes here",
     storyCategory: "Tech",
+    createdAt: new Date().toString(),
   },
 ];
