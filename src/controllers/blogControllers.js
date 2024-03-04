@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from "uuid";
-import { stories } from "../constants/index.js";
 import Story from "../models/storyModels.js";
 
 export async function getStories(req, res) {
@@ -16,7 +14,7 @@ export async function getSingleStory(req, res) {
   // const foundStory = stories.find((story) => story.storyID === id);
   // res.send(foundStory);
   try {
-    const story = await Story.findOne({ storyID: id });
+    const story = await Story.findById(id);
     res.status(200).json(story);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -25,12 +23,7 @@ export async function getSingleStory(req, res) {
 
 export async function createStory(req, res) {
   // const { storyContent, storyTitle, storyImageURL, storyCategory } = req.body;
-  const story = {
-    storyID: uuidv4(),
-    ...req.body,
-  };
-  // stories.push(story);
-
+  const story = { ...req.body };
   try {
     const newStory = await Story.create(story);
     res.status(200).json(newStory);
@@ -38,23 +31,36 @@ export async function createStory(req, res) {
     console.log(error.message);
     res.status(500).json({ message: error.message });
   }
-
-  // return res
-  //   .status(200)
-  //   .send(
-  //     `The story with title: ${req.body.storyTitle} was created successfully`
-  //   );
-  //       json({ message: "Story created successfully" });
 }
-export function updateStory(req, res) {
-  const { id } = req.params;
-  const { storyContent, storyTitle, storyImageURL, storyCategory } = req.body;
-  const storyToBeUpdated = stories.find((story) => story.storyID === id);
-  console.log(storyToBeUpdated);
-  if (storyContent) storyToBeUpdated.storyContent = storyContent;
-  if (storyTitle) storyToBeUpdated.storyTitle = storyTitle;
-  if (storyImageURL) storyToBeUpdated.storyImageURL = storyImageURL;
-  if (storyCategory) storyToBeUpdated.storyCategory = storyCategory;
 
-  res.status(200).send("Story updated successfully");
+export async function updateStory(req, res) {
+  const { id } = req.params;
+  const updatedStoryData = req.body;
+  try {
+    const updatedStory = await Story.findOneAndUpdate(
+      { _id: id },
+      updatedStoryData,
+      { new: true }
+    );
+    if (!updateStory) {
+      res.status(404).send({ message: "Story not found" });
+    }
+    res.status(200).json(updatedStory);
+  } catch (error) {
+    console.log(error.message);
+    res.status(400).send({ message: error.message });
+  }
+}
+
+export async function deleteStory(req, res) {
+  const { id } = req.params;
+  try {
+    const storyToDelete = await Story.findByIdAndDelete(id);
+    if (!storyToDelete) {
+      return res.status(404).send({ message: "Story not found" });
+    } else
+      return res.status(200).json({ message: "Story deleted successfully" });
+  } catch (error) {
+    res.status(400).send({ message: error.message });
+  }
 }

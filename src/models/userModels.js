@@ -1,19 +1,19 @@
 import mongoose from "mongoose";
 
-const storySchema = new mongoose.Schema({
-  storyTitle: {
+const userSchema = new mongoose.Schema({
+  firstName: {
     type: String,
     required: true,
   },
-  storyContent: {
+  lastName: {
     type: String,
     required: true,
   },
-  storyImageURL: {
+  email: {
     type: String,
     required: true,
   },
-  storyCategory: {
+  password: {
     type: String,
     required: true,
   },
@@ -22,4 +22,4 @@ const storySchema = new mongoose.Schema({
     default: new Date().toString(),
   },
 });
-export default new mongoose.model("Story", storySchema);
+export default new mongoose.model("Users", userSchema);
