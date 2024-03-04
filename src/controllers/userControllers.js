@@ -1,8 +1,8 @@
 import Users from "../models/userModels.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+
 export async function getUsers(req, res) {
-  //   const { id } = req.params;
   try {
     const users = await Users.find({});
     res.json(users);
@@ -81,4 +81,27 @@ export async function login(req, res) {
     });
   }
   const accessToken = jwt.sign({ email }, process.env.AUTH_SECRET);
+  res.send({
+    status: "done",
+    message: "User logged in successfully",
+    accessToken,
+  });
+}
+
+export function verifyToken(req, res, next) {
+  const header = req.headers["authorization"];
+  if (!header) {
+    console.log(req.headers);
+    return res
+      .status(403)
+      .send({ message: "Access denied. ERR_TOKEN_NOT_PASSED" });
+  }
+  const token = header && header.split(" ")[1];
+  jwt.verify(token, process.env.AUTH_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({ message: "Invalid or expired token" });
+    }
+    req.decoded = decoded;
+    next();
+  });
 }
