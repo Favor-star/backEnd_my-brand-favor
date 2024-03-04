@@ -16,7 +16,7 @@ export async function registerUser(req, res) {
   const userExists = await Users.findOne({ email: email });
   if (userExists) {
     return res.status(400).send({
-      status: "Fail",
+      OK: false,
       message: "User already exists",
     });
   }
@@ -24,14 +24,17 @@ export async function registerUser(req, res) {
   if (!hashedPassword)
     return res
       .status(403)
-      .send({ message: "The password couldn't be processed effectively" });
+      .send({
+        OK: false,
+        message: "The password couldn't be processed effectively",
+      });
   const userToAdd = { firstName, lastName, email, password: hashedPassword };
 
   try {
     const user = await Users.create(userToAdd);
     res.status(200).send(user);
   } catch (error) {
-    res.send({ message: error.message });
+    res.send({ OK: false, message: "User could not be created" });
   }
 }
 
@@ -43,11 +46,13 @@ export async function updateUser(req, res) {
       new: true,
     });
     if (!userToUpdate) {
-      return res.status(400).send({ message: "User not found" });
+      return res.status(400).send({ OK: false, message: "User not found" });
     }
     res.status(200).json(userToUpdate);
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res
+      .status(404)
+      .send({ OK: false, message: "Internal server error. Please try again." });
   }
 }
 
@@ -60,7 +65,9 @@ export async function deleteUser(req, res) {
     }
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res
+      .status(404)
+      .send({ OK: false, message: "Internal Server error. Please try again." });
   }
 }
 
@@ -69,20 +76,20 @@ export async function login(req, res) {
   const userFound = await Users.findOne({ email: email });
   if (!userFound) {
     return res.status(400).send({
-      status: "fail",
+      OK: false,
       message: "User is not found",
     });
   }
   const isLoginValid = bcrypt.compareSync(password, userFound.password);
   if (!isLoginValid) {
     return res.status(404).send({
-      status: "fail",
+      OK: false,
       message: "Invalid Password",
     });
   }
   const accessToken = jwt.sign({ email }, process.env.AUTH_SECRET);
   res.send({
-    status: "done",
+    OK: true,
     message: "User logged in successfully",
     accessToken,
   });
@@ -94,12 +101,14 @@ export function verifyToken(req, res, next) {
     console.log(req.headers);
     return res
       .status(403)
-      .send({ message: "Access denied. ERR_TOKEN_NOT_PASSED" });
+      .send({ OK: false, message: "Access denied. ERR_TOKEN_NOT_PASSED" });
   }
   const token = header && header.split(" ")[1];
   jwt.verify(token, process.env.AUTH_SECRET, (err, decoded) => {
     if (err) {
-      return res.status(401).send({ message: "Invalid or expired token" });
+      return res
+        .status(401)
+        .send({ OK: false, message: "Invalid or expired token" });
     }
     req.decoded = decoded;
     next();
