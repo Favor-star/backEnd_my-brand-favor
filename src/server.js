@@ -1,8 +1,10 @@
 import express from "express";
 import blogsRouter from "./routes/blogsRouter.js";
 import usersRouter from "./routes/usersRouter.js";
+import commentRouter from "./routes/commentsRouter.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+
 dotenv.config();
 
 
@@ -14,6 +16,13 @@ app.get("/", (req, res) => {
 
 app.use("/blogs", blogsRouter);
 app.use("/users", usersRouter);
+app.use("/comments", commentRouter);
+app.get("*", (req, res) => {
+  res.status(400).send({
+    OK: false,
+    message: "Route does not exist! Please re-check the route",
+  });
+});
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
