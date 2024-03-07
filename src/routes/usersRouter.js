@@ -1,11 +1,11 @@
 import express from "express";
+import { verifyToken } from "../authMiddleware/authenticator.js";
 import {
   registerUser,
   getUsers,
   deleteUser,
   updateUser,
   login,
-  verifyToken,
 } from "../controllers/userControllers.js";
 
 const router = express.Router();

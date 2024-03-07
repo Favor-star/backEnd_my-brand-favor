@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const commentsSchema = mongoose.Schema({
+const commentBodySchema = mongoose.Schema({
   commenter: {
     type: [String],
     required: true,
@@ -13,8 +13,15 @@ const commentsSchema = mongoose.Schema({
     type: String,
     default: new Date().toString(),
   },
+});
+
+const commentsSchema = mongoose.Schema({
   storyID: {
     type: String,
+    required: true,
+  },
+  comments: {
+    type: [commentBodySchema],
     required: true,
   },
 });

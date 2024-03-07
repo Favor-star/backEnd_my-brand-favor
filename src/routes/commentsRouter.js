@@ -2,18 +2,17 @@ import express from "express";
 import {
   addComment,
   getComments,
-  getSingleComment,
+  getSingleStoryComments,
+  deleteComment,
+  updateComment,
 } from "../controllers/commentsControllers.js";
+import { verifyToken } from "../authMiddleware/authenticator.js";
 
 const router = express.Router();
 
-router.get("/", getComments);
+router.get("/",verifyToken, getComments);
 router.post("/", addComment);
-router.get("/:id", getSingleComment);
-router.get("/*", (req, res) => {
-  res.status(400).send({
-    OK: false,
-    message: "Route does not exist! Please re-check the route",
-  });
-});
+router.get("/:id", getSingleStoryComments);
+router.delete("/:id", deleteComment);
+router.patch("/:storyID/:id", updateComment);
 export default router;

@@ -5,8 +5,13 @@ export async function getStories(req, res) {
     const stories = await Story.find({});
     res.status(200).json(stories);
   } catch (error) {
-    console.error(error.message);
-    res.status(500).json({ message: message.error });
+    res
+      .status(500)
+      .json({
+        OK: false,
+        message: "unexpecte error. Please try again!",
+        errorMessage: error.message,
+      });
   }
 }
 export async function getSingleStory(req, res) {
@@ -28,7 +33,6 @@ export async function createStory(req, res) {
     const newStory = await Story.create(story);
     res.status(200).json(newStory);
   } catch (error) {
-    console.log(error.message);
     res.status(500).json({ message: error.message });
   }
 }
@@ -43,12 +47,11 @@ export async function updateStory(req, res) {
       { new: true }
     );
     if (!updateStory) {
-      res.status(404).send({ message: "Story not found" });
+      res.status(404).send({ OK: false, message: "Story not found" });
     }
     res.status(200).json(updatedStory);
   } catch (error) {
-    console.log(error.message);
-    res.status(400).send({ message: error.message });
+    res.status(404).send({ OK: false, message: "Unexpected erros occurred" });
   }
 }
 
@@ -57,10 +60,16 @@ export async function deleteStory(req, res) {
   try {
     const storyToDelete = await Story.findByIdAndDelete(id);
     if (!storyToDelete) {
-      return res.status(404).send({ message: "Story not found" });
+      return res.status(404).send({ OK: false, message: "Story not found" });
     } else
-      return res.status(200).json({ message: "Story deleted successfully" });
+      return res
+        .status(200)
+        .json({ OK: true, message: "Story deleted successfully" });
   } catch (error) {
-    res.status(400).send({ message: error.message });
+    res.status(400).send({
+      OK: false,
+      message: "Unexpected error. Please try again",
+      errorMessage: error.message,
+    });
   }
 }

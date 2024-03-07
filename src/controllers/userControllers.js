@@ -22,12 +22,10 @@ export async function registerUser(req, res) {
   }
   const hashedPassword = bcrypt.hashSync(password, 10);
   if (!hashedPassword)
-    return res
-      .status(403)
-      .send({
-        OK: false,
-        message: "The password couldn't be processed effectively",
-      });
+    return res.status(403).send({
+      OK: false,
+      message: "The password couldn't be processed effectively",
+    });
   const userToAdd = { firstName, lastName, email, password: hashedPassword };
 
   try {
@@ -61,9 +59,9 @@ export async function deleteUser(req, res) {
   try {
     const userToDelete = await Users.findByIdAndDelete(id);
     if (!userToDelete) {
-      return res.status(400).send({ message: "User was not found" });
+      return res.status(400).send({ OK: false, message: "User was not found" });
     }
-    res.status(200).json({ message: "User deleted successfully" });
+    res.status(200).json({ OK: true, message: "User deleted successfully" });
   } catch (error) {
     res
       .status(404)
@@ -92,25 +90,5 @@ export async function login(req, res) {
     OK: true,
     message: "User logged in successfully",
     accessToken,
-  });
-}
-
-export function verifyToken(req, res, next) {
-  const header = req.headers["authorization"];
-  if (!header) {
-    console.log(req.headers);
-    return res
-      .status(403)
-      .send({ OK: false, message: "Access denied. ERR_TOKEN_NOT_PASSED" });
-  }
-  const token = header && header.split(" ")[1];
-  jwt.verify(token, process.env.AUTH_SECRET, (err, decoded) => {
-    if (err) {
-      return res
-        .status(401)
-        .send({ OK: false, message: "Invalid or expired token" });
-    }
-    req.decoded = decoded;
-    next();
   });
 }
