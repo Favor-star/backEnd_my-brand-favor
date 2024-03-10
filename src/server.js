@@ -7,7 +7,6 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-
 const app = express();
 app.use(express.json());
 app.get("/", (req, res) => {
@@ -30,3 +29,5 @@ mongoose
     console.log("Database connected successfully");
   })
   .catch((error) => console.error(error));
+  
+export default app;

@@ -3,6 +3,11 @@ import Story from "../models/storyModels.js";
 export async function getStories(req, res) {
   try {
     const stories = await Story.find({});
+    if (stories.length === 0) {
+      return res
+        .status(404)
+        .send({ OK: false, message: "Stories are not found" });
+    }
     res.status(200).json(stories);
   } catch (error) {
     res.status(500).json({
