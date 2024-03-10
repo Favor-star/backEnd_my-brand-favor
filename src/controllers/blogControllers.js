@@ -5,13 +5,11 @@ export async function getStories(req, res) {
     const stories = await Story.find({});
     res.status(200).json(stories);
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        OK: false,
-        message: "unexpecte error. Please try again!",
-        errorMessage: error.message,
-      });
+    res.status(500).json({
+      OK: false,
+      message: "unexpecte error. Please try again!",
+      errorMessage: error.message,
+    });
   }
 }
 export async function getSingleStory(req, res) {
