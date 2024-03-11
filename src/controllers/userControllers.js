@@ -7,7 +7,11 @@ export async function getUsers(req, res) {
     const users = await Users.find({});
     res.json(users);
   } catch (error) {
-    res.send({ message: error.message });
+    res.status(404).send({
+      OK: false,
+      message: "Users could not be found",
+      errorMessage: error.message,
+    });
   }
 }
 export async function registerUser(req, res) {

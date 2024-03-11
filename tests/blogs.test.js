@@ -21,5 +21,26 @@ describe("TEST THE GET USER API", function () {
 });
 
 describe("TEST POST REQUEST ON USER API", () => {
-  it("should return Route not found on non-existing route", async () => {}, 10000);
+  it("should return story not creeted when there is an error", async () => {
+    const result = await request(app).post("/blogs").send({
+      storyTitle: "favour",
+      storyContent: "Test",
+    });
+    expect(result.statusCode).toBe(500);
+    expect(result.body.message).toEqual("Story could not be created");
+  }, 10000);
+  it("should return rout not found on non-existing route", async () => {
+    const result = await request(app).post("/*").send({
+      storyContent: "contents",
+      storyTitle: "title",
+    });
+    expect(result.body.OK).toBeFalsy();
+    expect(result.body.message).toMatch(/does not exist/);
+  });
 });
+
+// describe("TEST THE DELETE REQUEST ON BLOGS API",()=>{
+//   it('should return id is incorrect when the id passed is incorrect', async () => {
+//     const result = request(app)
+//   })
+// });

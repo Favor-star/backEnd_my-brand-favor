@@ -1,7 +1,16 @@
-import { describe, expect,it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
+import request from "supertest";
+import app from "../src/server.js";
 
-describe("group", () => {
-  it("should return false alarm", () => {
-    expect(true).toBe(true);
-  });
+vi.mock("../models/userModels.js");
+vi.mock("../authMiddleware/authenticator.js",(req,res,next)=>{
+  
+  next();
+})
+describe("TESING FETCH USERS", () => {
+  it("should return users list if the list is found", async () => {
+    const result = await request(app).get("/users");
+    console.log(result)
+    expect(result.statusCode).toBe(200);
+  }, 10000);
 });

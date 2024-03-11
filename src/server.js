@@ -22,6 +22,12 @@ app.get("*", (req, res) => {
     message: "Route does not exist! Please re-check the route",
   });
 });
+app.post("*", (req, res) => {
+  res.status(400).send({
+    OK: false,
+    message: "Route does not exist! Please re-check the route",
+  });
+});
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
