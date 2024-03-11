@@ -34,7 +34,11 @@ export async function createStory(req, res) {
   const story = { ...req.body };
   try {
     const newStory = await Story.create(story);
-    res.status(200).json(newStory);
+    res.status(200).send({
+      OK: true,
+      message: "Story created successfully",
+      storyCreated: { ...newStory },
+    });
   } catch (error) {
     res.status(500).json({
       OK: false,
@@ -56,7 +60,10 @@ export async function updateStory(req, res) {
     if (!updateStory) {
       res.status(404).send({ OK: false, message: "Story not found" });
     }
-    res.status(200).json(updatedStory);
+    res.status(200).send({
+      OK: true,
+      message: "Story updated successfully",
+    });
   } catch (error) {
     res.status(404).send({ OK: false, message: "Unexpected erros occurred" });
   }
@@ -79,11 +86,4 @@ export async function deleteStory(req, res) {
       errorMessage: error.message,
     });
   }
-}
-
-export function handleNonRoute(req, res) {
-  res.status(404).send({
-    OK: false,
-    message: "Route could not be found. Please try again",
-  });
 }

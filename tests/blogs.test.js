@@ -5,7 +5,7 @@ import { expect, it, describe, beforeAll, vi } from "vitest";
 
 vi.mock("../src/models/userModels.js");
 
-describe("TEST THE GET USER API", function () {
+describe("TEST THE GET STORIES API", function () {
   it("should return no story found object once there are no stories found", async () => {
     const response = await request(app).get("/blogs");
     expect(response.status).toBe(200);
@@ -37,6 +37,17 @@ describe("TEST POST REQUEST ON USER API", () => {
     expect(result.body.OK).toBeFalsy();
     expect(result.body.message).toMatch(/does not exist/);
   });
+  it("should create story if story object is passed", async () => {
+    const result = await request(app).post("/blogs").send({
+      storyTitle: "Story title",
+      storyContent: "Story contents",
+      storyCategory: "Category goes here",
+      storyImageURL: "image goes here",
+    });
+    expect(result.statusCode).toBe(200);
+    expect(result.body.OK).toBeTruthy();
+    expect(result.body.message).toMatch(/created/);
+  });
 });
 
 // describe("TEST THE DELETE REQUEST ON BLOGS API",()=>{
@@ -44,3 +55,29 @@ describe("TEST POST REQUEST ON USER API", () => {
 //     const result = request(app)
 //   })
 // });
+
+describe("TEST THE UPDATE STORIES FUNCTION", () => {
+  it("should update the story if the ID passed is correct", async () => {
+    const id = "65eeb1e174dea18f785f85c1";
+    const updatedData = { storyTitle: "Updated title" };
+    const result = await request(app).patch(`/blogs/${id}`).send(updatedData);
+    expect(result.statusCode).toBe(200);
+    expect(result.body.OK).toBeTruthy();
+  }, 10000);
+  it("should not upddate the story if the  ID passed is incorrect", async () => {
+    const id = "12";
+    const updatedData = { storyTitle: "Updated title" };
+    const result = await request(app).patch(`/blogs/${id}`).send(updatedData);
+    expect(result.statusCode).toBe(404);
+    expect(result.body.OK).toBeFalsy();
+  }, 10000);
+});
+
+describe("TEST THE DELETE STORY ENDPOINTS", () => {
+  it("should delete the story if the ID is passed is correct", async () => {
+    const id = "65eeb1e174dea18f785f85c1";
+    const result = await request(app).delete(`/blogs/${id}`);
+    expect(result.statusCode).toBe(200);
+    expect(result.body.OK).toBeTruthy();
+  }, 10000);
+});
