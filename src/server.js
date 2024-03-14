@@ -4,11 +4,12 @@ import usersRouter from "./routes/usersRouter.js";
 import commentRouter from "./routes/commentsRouter.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
-
+import cors from "cors";
 dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cors());
 app.get("/", (req, res) => {
   res.send("hello");
 });
@@ -35,5 +36,5 @@ mongoose
     console.log("Database connected successfully");
   })
   .catch((error) => console.error(error));
-  
+
 export default app;
