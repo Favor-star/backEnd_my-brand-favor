@@ -2,6 +2,7 @@ import express from "express";
 import blogsRouter from "./routes/blogsRouter.js";
 import usersRouter from "./routes/usersRouter.js";
 import commentRouter from "./routes/commentsRouter.js";
+// import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -9,6 +10,9 @@ dotenv.config();
 
 const app = express();
 app.use(cors());
+// app.use(bodyParser({ limit: "20mb" }));
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(express.json());
 app.get("/", (req, res) => {
   res.send("hello");
