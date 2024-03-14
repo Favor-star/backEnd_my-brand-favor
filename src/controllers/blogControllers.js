@@ -37,7 +37,7 @@ export async function createStory(req, res) {
     res.status(200).send({
       OK: true,
       message: "Story created successfully",
-      storyCreated: { ...newStory },
+      newStory,
     });
   } catch (error) {
     res.status(500).json({
