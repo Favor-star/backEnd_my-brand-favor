@@ -24,5 +24,6 @@ const commentsSchema = mongoose.Schema({
     type: [commentBodySchema],
     required: true,
   },
+  likedBy: [String],
 });
 export default new mongoose.model("Comments", commentsSchema);

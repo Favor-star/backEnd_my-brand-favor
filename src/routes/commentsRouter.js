@@ -11,8 +11,8 @@ import { verifyToken } from "../authMiddleware/authenticator.js";
 const router = express.Router();
 
 router.get("/",verifyToken, getComments);
-router.post("/", addComment);
-router.get("/:id", getSingleStoryComments);
-router.delete("/:id", deleteComment);
-router.patch("/:storyID/:id", updateComment);
+router.post("/",verifyToken, addComment);
+router.get("/:id",verifyToken, getSingleStoryComments);
+router.delete("/:id",verifyToken, deleteComment);
+router.patch("/:storyID/:id",verifyToken, updateComment);
 export default router;

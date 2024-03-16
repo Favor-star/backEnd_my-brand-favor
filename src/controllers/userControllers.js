@@ -1,7 +1,6 @@
 import Users from "../models/userModels.js";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
-
+import createToken from "../authMiddleware/createToken.js";
 export async function getUsers(req, res) {
   try {
     const users = await Users.find({});
@@ -19,14 +18,14 @@ export async function registerUser(req, res) {
 
   const userExists = await Users.findOne({ email: email });
   if (userExists) {
-    return res.status(400).send({
+    return res.status(200).send({
       OK: false,
       message: "User already exists",
     });
   }
   const hashedPassword = bcrypt.hashSync(password, 10);
   if (!hashedPassword)
-    return res.status(403).send({
+    return res.status(200).send({
       OK: false,
       message: "The password couldn't be processed effectively",
     });
@@ -34,7 +33,13 @@ export async function registerUser(req, res) {
 
   try {
     const user = await Users.create(userToAdd);
-    res.status(200).send(user);
+    const accessToken = createToken({ userName: firstName, email });
+    res.status(201).send({
+      OK: true,
+      message: "User created successfully",
+      user,
+      accessToken,
+    });
   } catch (error) {
     res.send({ OK: false, message: "User could not be created" });
   }
@@ -50,7 +55,7 @@ export async function updateUser(req, res) {
     if (!userToUpdate) {
       return res.status(400).send({ OK: false, message: "User not found" });
     }
-    res.status(200).json(userToUpdate);
+    res.status(202).json(userToUpdate);
   } catch (error) {
     res
       .status(404)
@@ -77,22 +82,24 @@ export async function login(req, res) {
   const { email, password } = req.body;
   const userFound = await Users.findOne({ email: email });
   if (!userFound) {
-    return res.status(400).send({
+    return res.status(200).send({
       OK: false,
       message: "User is not found",
     });
   }
   const isLoginValid = bcrypt.compareSync(password, userFound.password);
   if (!isLoginValid) {
-    return res.status(404).send({
+    return res.status(200).send({
       OK: false,
-      message: "Invalid Password",
+      message: "Password is incorect",
     });
   }
-  const accessToken = jwt.sign({ email }, process.env.AUTH_SECRET);
+  const accessToken = createToken({ userName: userFound.firstName, email });
+  const { firstName, lastName } = userFound;
   res.send({
     OK: true,
     message: "User logged in successfully",
+    user: { firstName, lastName, email },
     accessToken,
   });
 }

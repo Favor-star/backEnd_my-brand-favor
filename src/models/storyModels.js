@@ -17,6 +17,14 @@ const storySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  storyImageCaption: {
+    type: String,
+    default: "This is supposed to be image caption",
+  },
+  storyVisits: {
+    type: Number,
+    default: 0,
+  },
   createdAt: {
     type: String,
     default: new Date().toString(),
