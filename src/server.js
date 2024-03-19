@@ -7,14 +7,22 @@ import contactMeRouter from "./routes/contactMeRouter.js";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import cors from "cors";
+import swaggerUI from "swagger-ui-express";
+import swaggerJsDoc from "swagger-jsdoc";
 dotenv.config();
 
 const app = express();
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    "Access-Control-Allow-Methods": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+  })
+);
+app.use(express.json());
 // app.use(bodyParser({ limit: "20mb" }));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
-app.use(express.json());
 app.get("/", (req, res) => {
   res.send("hello");
 });
@@ -22,7 +30,7 @@ app.get("/", (req, res) => {
 app.use("/blogs", blogsRouter);
 app.use("/users", usersRouter);
 app.use("/comments", commentRouter);
-app.use("/contact", contactMeRouter);
+app.use("/contact-me", contactMeRouter);
 app.get("*", (req, res) => {
   res.status(400).send({
     OK: false,

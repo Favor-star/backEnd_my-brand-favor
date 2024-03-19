@@ -47,7 +47,7 @@ export async function addComment(req, res) {
 export async function getSingleStoryComments(req, res) {
   const { id } = req.params;
   try {
-    const singleComment = await Comments.findById(id);
+    const singleComment = await Comments.find({ storyID: id });
     if (!singleComment) {
       return res.status(404).send({
         OK: false,
@@ -114,6 +114,48 @@ export async function updateComment(req, res) {
     res.status(500).send({
       OK: false,
       message: "Unexpected error! Please try again.",
+      errorMessage: error.message,
+    });
+  }
+}
+
+export async function updateLikes(req, res) {
+  const { likedBy } = req.body;
+  const { storyID } = req.params;
+  try {
+    const story = await Comments.findOne({ storyID: storyID });
+    if (!story) {
+      const comments = await Comments.create({
+        storyID,
+        comments: [],
+        likedBy: likedBy,
+      });
+      return res.status(201).send({
+        OK: true,
+        message: "Like was added created successfully",
+      });
+    }
+    const likes = story.likedBy;
+    const isLikeFound = likes.includes(likedBy);
+    if (isLikeFound) {
+      const newLikes = likes.filter((like) => like !== likedBy);
+      story.likedBy = newLikes;
+      await story.save();
+      return res.status(200).send({
+        OK: true,
+        message: "Like removed successfully",
+      });
+    }
+    story.likedBy.push(likedBy);
+    await story.save();
+    res.status(200).send({
+      OK: true,
+      message: "Like added successfully",
+    });
+  } catch (error) {
+    res.status(500).send({
+      OK: false,
+      message: "Unexpected error",
       errorMessage: error.message,
     });
   }
