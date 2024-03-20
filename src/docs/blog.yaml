@@ -20,7 +20,7 @@ paths:
       summary: Create a new story
       tags:
         - Stories
-      description: This is to test adding comments
+      description: This is to test adding a story
       requestBody:
         required: true
         content:
@@ -42,10 +42,10 @@ paths:
         500:
           description: Story could not be created.
 
-  /blogs/{id}: # URL path with ID parameter
-    patch: # Operation definition
-      summary: Update the user
-      description: This method deals with updating the user
+  /blogs/{id}: 
+    patch: 
+      summary: Update the story
+      description: This method deals with updating the story contents
       tags:
         - Stories
       parameters:

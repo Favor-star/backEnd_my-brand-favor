@@ -11,7 +11,7 @@ export async function getComments(req, res) {
     }
     res.status(200).send(comments);
   } catch (error) {
-    res.status(400).send({
+    res.status(500).send({
       OK: false,
       message: "Unexpected error. Please try again!",
     });
@@ -26,7 +26,7 @@ export async function addComment(req, res) {
     if (existingComment) {
       existingComment.comments.push(retrievedComment);
       await existingComment.save();
-      return res.status(200).send({
+      return res.status(201).send({
         OK: true,
         message: "Comment created successfully",
       });
@@ -87,7 +87,7 @@ export async function deleteComment(req, res) {
 
 export async function updateComment(req, res) {
   const { storyID, id } = req.params;
-  const { commenter, commentBody } = req.body;
+  const { commentor, commentBody } = req.body;
   try {
     const existingComment = await Comments.findOne({ storyID: storyID });
     if (!existingComment) {
@@ -103,7 +103,7 @@ export async function updateComment(req, res) {
       return res
         .status(404)
         .send({ Ok: false, message: "No such comment found" });
-    if (commenter) commentToUpdate.commenter = commenter;
+    if (commentor) commentToUpdate.commentor = commentor;
     if (commentBody) commentToUpdate.commentBody = commentBody;
     await existingComment.save();
     res.status(200).send({
@@ -148,7 +148,7 @@ export async function updateLikes(req, res) {
     }
     story.likedBy.push(likedBy);
     await story.save();
-    res.status(200).send({
+    res.status(201).send({
       OK: true,
       message: "Like added successfully",
     });

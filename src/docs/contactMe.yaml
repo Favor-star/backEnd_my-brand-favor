@@ -1,0 +1,31 @@
+tags:
+  - name: ContactMe
+    description: This deals with testing the users sent messages
+
+paths:
+  /contact-me:
+    post:
+      summary: User added a message
+      tags:
+        - ContactMe
+      description: This test whether the story could be created automatically
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                names:
+                  type: string
+                email:
+                  type: string
+                subject:
+                  type: string
+                messageBody:
+                  type: string
+      responses:
+        200:
+          description: Message sent successfully! We will reach to you very soon.
+        500:
+          description: Unexpected errors.

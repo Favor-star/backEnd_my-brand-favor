@@ -18,14 +18,14 @@ export async function registerUser(req, res) {
 
   const userExists = await Users.findOne({ email: email });
   if (userExists) {
-    return res.status(200).send({
+    return res.status(409).send({
       OK: false,
       message: "User already exists",
     });
   }
   const hashedPassword = bcrypt.hashSync(password, 10);
   if (!hashedPassword)
-    return res.status(200).send({
+    return res.status(401).send({
       OK: false,
       message: "The password couldn't be processed effectively",
     });
@@ -41,7 +41,7 @@ export async function registerUser(req, res) {
       accessToken,
     });
   } catch (error) {
-    res.send({ OK: false, message: "User could not be created" });
+    res.status(500).send({ OK: false, message: "User could not be created" });
   }
 }
 
@@ -53,12 +53,12 @@ export async function updateUser(req, res) {
       new: true,
     });
     if (!userToUpdate) {
-      return res.status(400).send({ OK: false, message: "User not found" });
+      return res.status(404).send({ OK: false, message: "User not found" });
     }
     res.status(202).json(userToUpdate);
   } catch (error) {
     res
-      .status(404)
+      .status(500)
       .send({ OK: false, message: "Internal server error. Please try again." });
   }
 }
@@ -68,12 +68,12 @@ export async function deleteUser(req, res) {
   try {
     const userToDelete = await Users.findByIdAndDelete(id);
     if (!userToDelete) {
-      return res.status(400).send({ OK: false, message: "User was not found" });
+      return res.status(404).send({ OK: false, message: "User was not found" });
     }
     res.status(200).json({ OK: true, message: "User deleted successfully" });
   } catch (error) {
     res
-      .status(404)
+      .status(500)
       .send({ OK: false, message: "Internal Server error. Please try again." });
   }
 }

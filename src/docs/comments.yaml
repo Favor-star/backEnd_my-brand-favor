@@ -1,0 +1,159 @@
+tags:
+  - name: Comments
+    description: Comments API
+paths:
+  /comments:
+    get:
+      summary: Get comments
+      tags:
+        - Comments
+      description: This tests the get request on comments
+      security:
+        - jwt: []
+      responses:
+        200:
+          description: Comments fetched successfully
+        404:
+          description: Comments could not be found
+        500:
+          description: Unexpected error. Please try again
+
+    post:
+      summary: Create a new comment
+      tags:
+        - Comments
+      description: This is to test adding comments
+      security:
+        - jwt: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                storyID:
+                  type: string
+                comments:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      commentor:
+                        type: array
+                        items:
+                          type: string
+                      commentBody:
+                        type: string
+                likedBy:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        201:
+          description: Comments created successfully
+        200:
+          description: New comment was added successfully.
+        500:
+          description: Unexpected error
+  /comments/{id}:
+    get:
+      summary: Get a single comment
+      description: this fetch a single comment when id of a story is passed
+      security:
+        - jwt: []
+      tags:
+        - Comments
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: string
+      responses:
+        200:
+          description: Comment found successfully
+        404:
+          description: Comment could not be found
+    delete:
+      summary: Delete a provided comment
+      tags:
+        - Comments
+      description: Delete a story once the id passes is correct
+      security:
+        - jwt: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: string
+      responses:
+        404:
+          description: Comment could not be found!
+        200:
+          description: Comment deleted successfully
+        500:
+          description: Unexpected error. Please try again
+  /comments/{storyID}/{id}:
+    patch:
+      summary: Update the comment
+      description: This method deals with updating the comment contents
+      security:
+        - jwt: []
+      tags:
+        - Comments
+      parameters:
+        - in: path
+          name: storyID
+          required: true
+          type: string
+        - in: path
+          name: id
+          required: true
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                commentor:
+                  type: string
+                commentBody:
+                  type: string
+      responses:
+        200:
+          description: Comment updated successfully
+        404:
+          description: Comment could not be found
+        500:
+          description: Unexpected errors occurred
+  /like/{storyID}:
+    patch:
+      summary: Update the like only
+      tags:
+        - Comments
+      description: This handles the request to update the lke; either remove it or add it
+      security:
+        - jwt: []
+      parameters:
+        - in: path
+          name: storyID
+          reuired: true
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                likedBy:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        200:
+          description: Like removed successfully
+        201:
+          description: Like removed successfully
