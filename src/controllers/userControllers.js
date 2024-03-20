@@ -4,7 +4,7 @@ import createToken from "../authMiddleware/createToken.js";
 export async function getUsers(req, res) {
   try {
     const users = await Users.find({});
-    res.json(users);
+    res.status(200).json(users);
   } catch (error) {
     res.status(404).send({
       OK: false,
@@ -82,21 +82,21 @@ export async function login(req, res) {
   const { email, password } = req.body;
   const userFound = await Users.findOne({ email: email });
   if (!userFound) {
-    return res.status(200).send({
+    return res.status(404).send({
       OK: false,
       message: "User is not found",
     });
   }
   const isLoginValid = bcrypt.compareSync(password, userFound.password);
   if (!isLoginValid) {
-    return res.status(200).send({
+    return res.status(401).send({
       OK: false,
       message: "Password is incorect",
     });
   }
   const accessToken = createToken({ userName: userFound.firstName, email });
   const { firstName, lastName } = userFound;
-  res.send({
+  res.status(200).send({
     OK: true,
     message: "User logged in successfully",
     user: { firstName, lastName, email },

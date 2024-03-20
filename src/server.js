@@ -19,6 +19,7 @@ app.use(
     "Access-Control-Allow-Methods": ["GET", "POST", "PUT", "PATCH", "DELETE"],
   })
 );
+
 app.use(express.json());
 // app.use(bodyParser({ limit: "20mb" }));
 app.use(express.json({ limit: "50mb" }));
@@ -26,6 +27,44 @@ app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.get("/", (req, res) => {
   res.send("hello");
 });
+
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Personal Portfolio API documentation",
+      version: "1.0.0",
+      description:
+        "This is a documentation of all APIs that I used during the development of my whole personal portfolio implementation",
+      contact: {
+        name: "Favour Eliab",
+      },
+    },
+    components: {
+      securitySchemes: {
+        jwt: {
+          type: "http",
+          scheme: "Bearer",
+          in: "header",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    servers: [
+      {
+        url: "http://localhost:8080",
+      },
+      {
+        url: "https://backend-my-brand-favor.onrender.com",
+      },
+    ],
+  },
+  schemes: ["http", "https"],
+  apis: ["./src/docs/*.yaml"],
+};
+const swaggerSpec = swaggerJsDoc(options);
+
+app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(swaggerSpec));
 
 app.use("/blogs", blogsRouter);
 app.use("/users", usersRouter);

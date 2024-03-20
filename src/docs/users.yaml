@@ -1,0 +1,42 @@
+tags:
+  - name: Users
+    description: Users API
+paths:
+  /users/login:
+    post:
+      summary: Log a user
+      tags:
+        - Users
+      description: To log a user in
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        404:
+          description: User is not found
+        401:
+          description: Password is incorrect
+        200:
+          description: User logged in successfully
+
+  /users:
+    get:
+      summary: Get a list of users
+      tags:
+        - Users
+      description: Return a full list of available users
+      security:
+        - jwt: []
+      responses:
+        404:
+          description: Users could not be found
+        200:
+          description: Success

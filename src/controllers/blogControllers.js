@@ -34,7 +34,7 @@ export async function createStory(req, res) {
   const story = { ...req.body };
   try {
     const newStory = await Story.create(story);
-    res.status(200).send({
+    res.status(201).send({
       OK: true,
       message: "Story created successfully",
       newStory,
@@ -65,7 +65,7 @@ export async function updateStory(req, res) {
       message: "Story updated successfully",
     });
   } catch (error) {
-    res.status(404).send({ OK: false, message: "Unexpected erros occurred" });
+    res.status(400).send({ OK: false, message: "Unexpected erros occurred" });
   }
 }
 

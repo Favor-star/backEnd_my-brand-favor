@@ -1,0 +1,94 @@
+tags:
+  - name: Stories
+    description: Story API
+paths:
+  /blogs:
+    get:
+      summary: Get stories
+      tags:
+        - Stories
+      description: This tests the get request
+      responses:
+        200:
+          description: Stories fetched successfully
+        400:
+          description: Stories could not be found
+        500:
+          description: Unexpected error. Please try again
+
+    post:
+      summary: Create a new story
+      tags:
+        - Stories
+      description: This is to test adding comments
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                storyTitle:
+                  type: string
+                storyContent:
+                  type: string
+                storyImageURL:
+                  type: string
+                storyCategory:
+                  type: string
+      responses:
+        201:
+          description: Story created successfully
+        500:
+          description: Story could not be created.
+
+  /blogs/{id}: # URL path with ID parameter
+    patch: # Operation definition
+      summary: Update the user
+      description: This method deals with updating the user
+      tags:
+        - Stories
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                storyTitle:
+                  type: string
+                storyContent:
+                  type: string
+                storyImageURL:
+                  type: string
+                storyCategory:
+                  type: string
+      responses:
+        200:
+          description: Story updated successfully
+        404:
+          description: Story could not be found
+        400:
+          description: Unexpected errors occurred
+    delete:
+      summary: Delete a provided story
+      tags:
+        - Stories
+      description: Delete a story once the id passes is correct
+      parameters:
+        - in: path
+          name: id
+          required: true
+          type: string
+      responses:
+        404:
+          description: Story not found
+        200:
+          description: Story deleted successfully
+        400:
+          description: Unexpected error. Please try again

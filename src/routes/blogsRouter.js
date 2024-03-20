@@ -8,7 +8,6 @@ import {
 } from "../controllers/blogControllers.js";
 
 const router = express.Router();
-
 router.get("/", getStories);
 router.post("/", createStory);
 router.get("/:id", getSingleStory);
