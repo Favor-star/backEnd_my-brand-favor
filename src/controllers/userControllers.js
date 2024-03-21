@@ -59,7 +59,11 @@ export async function updateUser(req, res) {
   } catch (error) {
     res
       .status(500)
-      .send({ OK: false, message: "Internal server error. Please try again." });
+      .send({
+        OK: false,
+        message: "Internal server error. Please try again.",
+        errorMessage: error.message,
+      });
   }
 }
 

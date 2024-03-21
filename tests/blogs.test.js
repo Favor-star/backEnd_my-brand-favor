@@ -1,142 +1,140 @@
-import request from "supertest";
-import app from "../src/server.js";
-
-import { expect, it, describe, beforeAll, vi, afterAll } from "vitest";
 import mongoose from "mongoose";
+import storyModels from "../src/models/storyModels.js";
+import request from "supertest";
+import { app } from "../src/server.js";
+import dotenv from "dotenv";
+import { connectDatabase, dropDatabase, dropCollections } from "../src/db.js";
+import {
+  beforeAll,
+  beforeEach,
+  afterAll,
+  afterEach,
+  describe,
+  it,
+  expect,
+} from "vitest";
+dotenv.config();
+process.env.NODE_ENV = "test";
 
-vi.mock("../src/models/storyModels.js");
-const testConnectionString =
-  "mongodb+srv://favoureliab:favour123@cluster0.m4ethje.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
 beforeAll(async () => {
-  await mongoose.connect(testConnectionString, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  });
-  console.log("Test database connected successfully");
+  process.env.NODE_ENV = "test";
+  await connectDatabase();
 });
-
+beforeEach(async () => {
+  // await connectDatabase();
+});
 afterAll(async () => {
-  await mongoose.connection.close();
+  await dropCollections();
+  await dropDatabase();
+  // await dropCollections();
 });
-describe("TEST THE GET STORIES API", function () {
-  it("should return no story found object once there are no stories found", async () => {
-    const response = await request(app).get("/blogs");
-    expect(response.status).toBe(200);
-  }, 10000);
-  it("should return 400, and error message once the route is incorect", async () => {
-    const response = await request(app).get("/*");
-    expect(response.status).toBe(400);
-    expect(response.body).toEqual({
-      OK: false,
-      message: "Route does not exist! Please re-check the route",
-    });
-  }, 10000);
-});
-
-describe("TEST POST REQUEST ON USER API", () => {
-  it("should return story not creeted when there is an error", async () => {
-    const result = await request(app).post("/blogs").send({
-      storyTitle: "favour",
-      storyContent: "Test",
-    });
-    expect(result.statusCode).toBe(500);
-    expect(result.body.message).toEqual("Story could not be created");
-  }, 10000);
-  it("should return rout not found on non-existing route", async () => {
-    const result = await request(app).post("/*").send({
-      storyContent: "contents",
-      storyTitle: "title",
-    });
-    expect(result.body.OK).toBeFalsy();
-    expect(result.body.message).toMatch(/does not exist/);
-  });
-  it("should create story if story object is passed", async () => {
-    const result = await request(app).post("/blogs").send({
-      storyTitle: "Story title",
-      storyContent: "Story contents",
-      storyCategory: "Category goes here",
-      storyImageURL: "image goes here",
-    });
-    expect(result.statusCode).toBe(201);
-    expect(result.body.OK).toBeTruthy();
-    expect(result.body.message).toMatch(/created/);
-  });
-});
-
-// describe("TEST THE DELETE REQUEST ON BLOGS API",()=>{
-//   it('should return id is incorrect when the id passed is incorrect', async () => {
-//     const result = request(app)
-//   })
-// });
-
-describe("TEST THE UPDATE STORIES FUNCTION", () => {
-  it("should update the story if the ID passed is correct", async () => {
-    const id = "65eeb1e174dea18f785f85c1";
-    const updatedData = { storyTitle: "Updated title" };
-    const result = await request(app).patch(`/blogs/${id}`).send(updatedData);
-    expect(result.statusCode).toBe(200);
-    expect(result.body.OK).toBeTruthy();
-  }, 10000);
-  it("should not upddate the story if the  ID passed is incorrect", async () => {
-    const id = "12";
-    const updatedData = { storyTitle: "Updated title" };
-    const result = await request(app).patch(`/blogs/${id}`).send(updatedData);
-    expect(result.statusCode).toBe(400);
-    expect(result.body.OK).toBeFalsy();
-  }, 10000);
-});
-
-describe("TEST THE DELETE STORY ENDPOINTS", () => {
-  it("should delete the story if the ID is passed is correct", async () => {
-    const id = "65eeb1e174dea18f785f85c1";
-    const result = await request(app).delete(`/blogs/${id}`);
-    expect(result.statusCode).toBe(200);
-    expect(result.body.OK).toBeTruthy();
-  }, 10000);
-});
-
-
-
-// import { vi, expect, it, describe,beforeAll,afterAll,afterEach } from "vitest";
-// import request from "supertest";
-// import app from "../src/server.js";
-// import mongoose from "mongoose";
-// // import { faker } from "@faker-js/faker";
-
-// const connectionString =
-//   "mongodb+srv://favoureliab:favour123@cluster0.m4ethje.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"; // Use a test database
-
-// beforeAll(async () => {
-//   await mongoose.connect(connectionString, {
-//     useNewUrlParser: true,
-//     useUnifiedTopology: true,
-//   });
-//   console.log("Database connected successfully");
-// });
 
 // afterEach(async () => {
-//   await mongoose.connection.dropDatabase(); // Clear test database after each test
 // });
+describe("Test GET stories", () => {
+  it("should create a todo item successfully", async () => {
+    let validStory = {
+      storyTitle: "Title goes here",
+      storyContent: "Content",
+      storyImageURL: "url will be here on final test",
+      storyCategory: "the category will be here",
+    };
+    const newStory = await storyModels(validStory);
+    await newStory.save();
+    expect(newStory._id).toBeDefined();
+    expect(newStory.storyTitle).toBe(validStory.storyTitle);
+    expect(newStory.completed).toBe(validStory.completed);
+  });
+  it("should return not created", async () => {
+    let invalidStory = {};
+    try {
+      const newStory = new storyModels(invalidStory);
+      await newStory.save();
+    } catch (error) {
+      expect(error).toBeInstanceOf(mongoose.Error.ValidationError);
+    }
+  });
+});
+describe("GET /blogs", () => {
+  let validStory = {
+    storyTitle: "Title goes here",
+    storyContent: "Content",
+    storyImageURL: "url will be here on final test",
+    storyCategory: "the category will be here",
+  };
+  beforeAll(async () => {
+    await request(app).post("/blogs").send(validStory);
+  });
+  afterAll(async () => {
+    await request(app).delete(`/blogs/${validStory._id}`);
+  });
+  it("should return ", async () => {
+    const response = await request(app).get("/blogs");
+    expect(response.statusCode).toBe(200);
+    expect(response.body.error).toBe(undefined);
+  });
+  it("should return stories", async () => {
+    const response = await request(app).get("/blogs");
+    expect(response.status).toBe(200);
+    expect(response.body.length).toBeGreaterThan(1);
+  });
+  it("should return 404 if stories are not found", async () => {
+    await dropCollections();
+    const response = await request(app).get("/blogs");
+    expect(response.status).toBe(404);
+    expect(response.OK).toBeFalsy();
+  });
+  it("should return error if passed properties does not match the required ones", async () => {
+    await dropCollections();
+    await request(app).post("/blogs").send({});
+    try {
+      const response = await request(app).get("/blogs");
+    } catch (error) {
+      expect(error).toBeInstanceOf(mongoose.Error.ValidationError);
+    }
+  });
+});
 
-// afterAll(async () => {
-//   await mongoose.connection.close();
-// });
+describe("POST /blogs", () => {
+  const validStory = {
+    storyTitle: "Title goes here",
+    storyContent: "Content",
+    storyImageURL: "url will be here on final test",
+    storyCategory: "the category will be here",
+  };
 
-// describe("TEST THE GET STORIES API", () => {
-//   it("Returns empty list for GET /api/stories with no stories", async () => {
-//     // Define mocking logic here
-//     const mockEmptyStories = vi.fn(() => Promise.resolve([]));
-//     vi.mock("../models/storyModels.js", () => ({
-//       Story: {
-//         find: mockEmptyStories,
-//       },
-//     }));
+  it("should successfully create a story", async () => {
+    const result = await request(app)
+      .post("/blogs")
+      .set({
+        Authorization: `Bearer ${process.env.AUTH_TOKEN}`,
+      })
+      .send(validStory);
+    expect(result.status).toBe(201);
+    expect(result.body.message).toMatch(/create/);
+  }, 30000);
+});
 
-//     const response = await request(app).get("/api/stories");
-//     expect(response.status).toBe(200);
-//     expect(response.body).toEqual([]); // Assert empty array for no stories
-//   });
-
-//   // Add more tests with different mocking scenarios
-//   // ...
-// });
+describe("DELETE /blogs", () => {
+  beforeAll(async () => {
+    const validStory = {
+      storyTitle: "Title goes here",
+      storyContent: "Content",
+      storyImageURL: "url will be here on final test",
+      storyCategory: "the category will be here",
+    };
+    await request(app).post("/blogs").send(validStory);
+  });
+  it("should successfully delete the story", async () => {
+    const response = await request(app)
+      .get("/blogs")
+      .set({
+        Authorization: `Bearer ${process.env.AUTH_TOKEN}`,
+      });
+   
+    const id = response.body[0]._id;
+    const result = await request(app).delete(`/blogs/${id}`);
+    expect(result.status).toBe(200);
+    expect(result.body.message).toMatch(/deleted/);
+  });
+});

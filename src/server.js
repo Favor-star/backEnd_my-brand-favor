@@ -83,14 +83,16 @@ app.post("*", (req, res) => {
   });
 });
 const portNmbr = process.env.PORT || 8080;
-mongoose
+if(process.env.NODE_ENV !== "test"){
+  mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
-    app.listen(portNmbr, () =>
-      console.log(`Server successfully started on port: ${portNmbr}`)
-    );
+    
     console.log("Database connected successfully");
   })
   .catch((error) => console.error(error));
-
-export default app;
+}
+app.listen(portNmbr, () => {
+      console.log(`Server successfully started on port: ${portNmbr}`);
+    });
+export { app };
