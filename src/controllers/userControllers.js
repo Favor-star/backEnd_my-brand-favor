@@ -48,6 +48,9 @@ export async function registerUser(req, res) {
 export async function updateUser(req, res) {
   const { id } = req.params;
   const updatedData = { ...req.body };
+  if ("password" in updatedData) {
+    updatedData.password = bcrypt.hashSync(updatedData.password, 10);
+  }
   try {
     const userToUpdate = await Users.findByIdAndUpdate(id, updatedData, {
       new: true,
@@ -55,15 +58,17 @@ export async function updateUser(req, res) {
     if (!userToUpdate) {
       return res.status(404).send({ OK: false, message: "User not found" });
     }
-    res.status(202).json(userToUpdate);
+    res.status(202).json({
+      OK: true,
+      message: "User successfully updated",
+      userToUpdate,
+    });
   } catch (error) {
-    res
-      .status(500)
-      .send({
-        OK: false,
-        message: "Internal server error. Please try again.",
-        errorMessage: error.message,
-      });
+    res.status(500).send({
+      OK: false,
+      message: "Internal server error. Please try again.",
+      errorMessage: error.message,
+    });
   }
 }
 
