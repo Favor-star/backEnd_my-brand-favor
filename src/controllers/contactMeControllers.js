@@ -18,16 +18,10 @@ export async function contactMe(req, res) {
 
 export async function getContactedPeople(req, res) {
   const questions = await ContactMe.find({});
-  if (!questions) {
-    return res.status(200).send({
+  if (!questions || questions.length === 0) {
+    return res.status(404).send({
       OK: false,
       message: "Contact forms not found",
-    });
-  }
-  if (questions.length === 0) {
-    return res.status(200).send({
-      OK: false,
-      message: "No contacts  people were found",
     });
   }
   res.status(200).send({

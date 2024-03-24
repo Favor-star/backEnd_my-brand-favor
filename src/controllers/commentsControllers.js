@@ -3,7 +3,7 @@ import Comments from "../models/commentsModels.js";
 export async function getComments(req, res) {
   try {
     const comments = await Comments.find({});
-    if (!comments) {
+    if (!comments || comments.length === 0) {
       return res.status(404).send({
         OK: true,
         message: "No comments found.",
@@ -48,7 +48,7 @@ export async function getSingleStoryComments(req, res) {
   const { id } = req.params;
   try {
     const singleComment = await Comments.find({ storyID: id });
-    if (!singleComment) {
+    if (!singleComment || singleComment.length === 0) {
       return res.status(404).send({
         OK: false,
         message: "No comment found!",
@@ -132,7 +132,7 @@ export async function updateLikes(req, res) {
       });
       return res.status(201).send({
         OK: true,
-        message: "Like was added created successfully",
+        message: "Like was  created successfully",
       });
     }
     const likes = story.likedBy;

@@ -31,6 +31,23 @@ afterAll(async () => {
 
 // afterEach(async () => {
 // });
+describe("General test on Server", () => {
+  it("should return welcome info when there is no route passed", async () => {
+    const result = await request(app).get("/");
+    expect(result.text).toContain("FAVOR'S PERSONAL PORTFOLIO");
+  });
+  it("should retun unknown route when post on non-existsing route", async () => {
+    const result = await request(app).post("/*").send({});
+
+    expect(result.body.OK).toBeFalsy();
+    expect(result.body.message).toMatch(/does not exist/);
+  });
+  it("should retun unknown route when GET on non-existsing route", async () => {
+    const result = await request(app).get("/*");
+    expect(result.body.OK).toBeFalsy();
+    expect(result.body.message).toMatch(/does not exist/);
+  });
+});
 describe("Test GET stories", () => {
   it("should create a todo item successfully", async () => {
     let validStory = {
@@ -66,9 +83,9 @@ describe("GET /blogs", () => {
     await request(app).post("/blogs").send(validStory);
   });
   afterAll(async () => {
-    await request(app).delete(`/blogs/${validStory._id}`);
+    const result = await request(app).delete(`/blogs/${validStory._id}`);
   });
-  it("should return ", async () => {
+  it("should successfully return stories ", async () => {
     const response = await request(app).get("/blogs");
     expect(response.statusCode).toBe(200);
     expect(response.body.error).toBe(undefined);
@@ -131,7 +148,6 @@ describe("DELETE /blogs", () => {
       .set({
         Authorization: `Bearer ${process.env.AUTH_TOKEN}`,
       });
-   
     const id = response.body[0]._id;
     const result = await request(app).delete(`/blogs/${id}`);
     expect(result.status).toBe(200);

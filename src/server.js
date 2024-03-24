@@ -25,7 +25,15 @@ app.use(express.json());
 app.use(express.json({ limit: "100mb" }));
 app.use(express.urlencoded({ extended: true, limit: "100mb" }));
 app.get("/", (req, res) => {
-  res.send("hello");
+  res.send(`<h1>HELLO THIS IS THE BACKEND OF FAVOR'S PERSONAL PORTFOLIO.</h1> 
+  <h2>Accepted Routes:</h2> 
+  <h3><ol>
+  <li> /blogs</li>
+  <li>/comments</li>
+  <li>/users</li>
+  <li>/contact-me</li>
+  </ol></h3>
+ `);
 });
 
 const options = {
@@ -83,16 +91,15 @@ app.post("*", (req, res) => {
   });
 });
 const portNmbr = process.env.PORT || 8080;
-if(process.env.NODE_ENV !== "test"){
+if (process.env.NODE_ENV !== "test") {
   mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    
-    console.log("Database connected successfully");
-  })
-  .catch((error) => console.error(error));
+    .connect(process.env.MONGO_URI)
+    .then(() => {
+      console.log("Database connected successfully");
+    })
+    .catch((error) => console.error(error));
 }
 app.listen(portNmbr, () => {
-      console.log(`Server successfully started on port: ${portNmbr}`);
-    });
+  console.log(`Server successfully started on port: ${portNmbr}`);
+});
 export { app };
